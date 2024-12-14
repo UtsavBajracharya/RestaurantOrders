@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Orders</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+    <a class="navbar-brand" href="index.html">Restaurant Orders</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Register Order</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="orders.html">Order List</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="search.html">Search Order</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="customer-orders.html">Customer Orders</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="container mt-5">
+    <div class="card p-4 shadow-sm">
+      <h1 class="text-primary mb-4">Customer Orders</h1>
+      <form id="customerForm">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="firstName">First Name</label>
+            <input type="text" class="form-control" id="firstName" required>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="lastName">Last Name</label>
+            <input type="text" class="form-control" id="lastName" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+      <table class="table table-striped mt-4">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer Name</th>
+            <th>Total Price</th>
+          </tr>
+        </thead>
+        <tbody id="customerOrders"></tbody>
+        <tfoot class="font-weight-bold">
+          <tr>
+            <td colspan="2" class="text-right">Total Amount:</td>
+            <td id="totalAmount"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <script>
+    document.getElementById('customerForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const response = await fetch(`http://localhost:5000/orders/customer/${firstName} ${lastName}`);
+      const orders = await response.json();
+      const customerOrders = document.getElementById('customerOrders');
+      const totalAmount = document.getElementById('totalAmount');
+      customerOrders.innerHTML = '';
+      let sum = 0;
+      orders.forEach(order => {
+        const totalPrice = order.quantity * order.price;
+        sum += totalPrice;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${order.orderId}</td>
+          <td>${order.firstName} ${order.lastName}</td>
+          <td>${totalPrice}</td>
+        `;
+        customerOrders.appendChild(row);
+      });
+      totalAmount.textContent = `$${sum.toFixed(2)}`;
+    });
+  </script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
