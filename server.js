@@ -7,17 +7,24 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 5000;
 
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/restaurant-orders')
-.then(() => console.log('MongoDB connected'))
-.catch((err) => {
+mongoose
+  .connect('mongodb://localhost:27017/restaurant-orders', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => {
     console.error('Connection error:', err);
     process.exit(1);
-});
+  });
 
 const orderSchema = new mongoose.Schema({
   orderId: { type: String, unique: true, required: true },
@@ -33,6 +40,10 @@ const Order = mongoose.model('Order', orderSchema);
 
 // Create a new order
 app.post('/orders', async (req, res) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: 'Request body is missing or empty' });
+  }
+
   const { orderId, firstName, lastName, quantity, price, foodOrdered, date } = req.body;
   try {
     const newOrder = new Order({ orderId, firstName, lastName, quantity, price, foodOrdered, date });
@@ -42,10 +53,11 @@ app.post('/orders', async (req, res) => {
     if (error.code === 11000) {
       res.status(400).json({ message: 'Order ID already exists' });
     } else {
-      res.status(500).json({ message: 'Server error' });
+      res.status(500).json({ message: 'Server error', error: error.message });
     }
   }
 });
+
 
 // Get all orders
 app.get('/orders', async (req, res) => {
@@ -112,5 +124,5 @@ app.get('/orders/date/:date', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });

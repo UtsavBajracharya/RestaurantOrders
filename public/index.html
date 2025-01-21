@@ -74,6 +74,45 @@
     </div>
   </div>
 
+  <script>
+  document.getElementById("orderForm").addEventListener("submit", async (event) => {
+    event.preventDefault(); // Prevent default form submission behavior
+    
+    // Gather form data
+    const order = {
+      orderId: document.getElementById("orderId").value,
+      date: document.getElementById("date").value,
+      firstName: document.getElementById("firstName").value,
+      lastName: document.getElementById("lastName").value,
+      quantity: parseInt(document.getElementById("quantity").value),
+      price: parseFloat(document.getElementById("price").value),
+      foodOrdered: document.getElementById("foodOrdered").value,
+    };
+
+    try {
+      // Send POST request to backend
+      const response = await fetch("http://localhost:5000/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(order),
+      });
+
+      if (response.ok) {
+        alert("Order registered successfully!");
+        document.getElementById("orderForm").reset(); // Clear form
+      } else {
+        const error = await response.json();
+        alert(`Failed to register order: ${error.message}`);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("An error occurred while registering the order.");
+    }
+  });
+  </script>
+
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
