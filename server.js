@@ -12,9 +12,11 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/restaurant-orders', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+mongoose.connect('mongodb://localhost:27017/restaurant-orders')
+.then(() => console.log('MongoDB connected'))
+.catch((err) => {
+    console.error('Connection error:', err);
+    process.exit(1);
 });
 
 const orderSchema = new mongoose.Schema({
