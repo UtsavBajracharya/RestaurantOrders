@@ -38,6 +38,7 @@
           <tr>
             <th>Order ID</th>
             <th>Customer Name</th>
+            <th>Food Ordered</th>
             <th>Total Price</th>
             <th>Date</th>
             <th>Actions</th>
@@ -62,6 +63,7 @@
           row.innerHTML = `
             <td>${order.orderId}</td>
             <td>${order.firstName} ${order.lastName}</td>
+            <td>${order.foodOrdered}</td>
             <td>${totalPrice.toFixed(2)}</td>
             <td>${formattedDate}</td>
             <td>
