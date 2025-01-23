@@ -126,3 +126,17 @@ app.get('/orders/date/:date', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+
+//Delete orders
+app.delete('/orders/:id', async (req, res) => {
+  try {
+    const order = await Order.findOneAndDelete({ orderId: req.params.id });
+    if (order) {
+      res.status(200).json({ message: 'Order deleted successfully' });
+    } else {
+      res.status(404).json({ message: 'Order ID not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});

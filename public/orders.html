@@ -58,6 +58,7 @@
           const totalPrice = order.quantity * order.price;
           const formattedDate = new Date(order.date).toISOString().split('T')[0];
           const row = document.createElement('tr');
+          row.setAttribute('data-id', order.orderId);
           row.innerHTML = `
             <td>${order.orderId}</td>
             <td>${order.firstName} ${order.lastName}</td>
@@ -70,23 +71,34 @@
           `;
           orderList.appendChild(row);
         });
+
+
       } catch (error) {
         console.error('Error fetching orders:', error);
       }
     }
 
-    function deleteOrder(orderId) {
+      function deleteOrder(orderId) {
       if (confirm('Are you sure you want to delete this order?')) {
         fetch(`http://localhost:5000/orders/${orderId}`, {
-          method: 'DELETE'
-        }).then(() => {
-          alert('Order deleted successfully!');
-          location.reload();
-        }).catch(err => console.error('Error deleting order:', err));
+          method: 'DELETE',
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Failed to delete the order');
+            }
+            return response.json();
+          })
+          .then(() => {
+            alert('Order deleted successfully!');
+            document.querySelector(`tr[data-id="${orderId}"]`).remove();
+          })
+          .catch((err) => console.error('Error deleting order:', err));
       }
     }
 
     fetchOrders();
+
   </script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
